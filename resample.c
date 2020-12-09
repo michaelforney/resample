@@ -80,11 +80,8 @@ resample(struct resampler *r)
 				y += x[-i] * h(p) >> 7;
 			for (i = 1, p = (t_in - t) * cutoff >> 16; i <= B && p <= t_max; ++i, p += dt)
 				y += x[i] * h(p) >> 7;
-			/* round */
-			if (y & 0x80)
-				y += 0x7f;
 			/* shift back and clamp to int16 range */
-			y = (y >> 8) * (long)cutoff >> 16;
+			y = (((y + 0x80) >> 8) * (long)cutoff + 0x8000) >> 16;
 			*r->out = y > 0x7fff ? 0x7fff : y < -0x8000 ? -0x8000 : y;
 			r->out += r->out_stride;
 			++n;
