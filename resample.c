@@ -42,7 +42,7 @@ resample_eof(struct resampler *r)
 	r->in_stride = 0;
 }
 
-/* evaluate the filter at time t, given in 16:16 fixed-point */
+/* evaluate the filter at time t, given in 16.16 fixed-point */
 static inline int16_t
 h(unsigned long t)
 {
@@ -53,7 +53,7 @@ h(unsigned long t)
 size_t
 resample(struct resampler *r)
 {
-	/* resample ratio, Fout/Fin, as 16:16 fixed-point */
+	/* resample ratio, Fout/Fin, as 16.16 fixed-point */
 	unsigned long ratio = r->out_rate * 0x10000ull / r->in_rate;
 	/* low-pass filter cutoff; 1 when upsampling, Fout/Fin when downsampling */
 	unsigned long cutoff = ratio > 0x10000 ? 0x10000 : ratio;
