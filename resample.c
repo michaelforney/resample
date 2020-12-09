@@ -10,15 +10,12 @@ https://ccrma.stanford.edu/~jos/resample/
 
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
 
-enum {
-	L = 256,
-};
-
 static const short filter[][2] = {
 #include "filter.h"
 };
 
 enum {
+	L = 256,
 	B = (LEN(((struct resampler *)0)->buf) / 2 - 1) / 2,
 };
 
