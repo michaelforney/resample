@@ -2,9 +2,6 @@
 /*
 windowed-sinc resampler, using the technique described in
 https://ccrma.stanford.edu/~jos/resample/
-
-BUGS: There is an issue with downsampling by a factor > 2, which
-has not yet been identified.
 */
 #include <stdint.h>
 #include <stdlib.h>
@@ -87,7 +84,7 @@ resample(struct resampler *r)
 			if (y & 0x80)
 				y += 0x7f;
 			/* shift back and clamp to int16 range */
-			y >>= 8;
+			y = (y >> 8) * (long)cutoff >> 16;
 			if (y > INT16_MAX)
 				y = INT16_MAX;
 			else if (y < INT16_MIN)
