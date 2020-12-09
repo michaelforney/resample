@@ -31,7 +31,7 @@ resample_init(struct resampler *r)
 void
 resample_eof(struct resampler *r)
 {
-	static const short zero[1];
+	static const int16_t zero[1];
 
 	/* flush the buffer by reading B zeros */
 	r->in = zero;
