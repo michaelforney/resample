@@ -85,11 +85,7 @@ resample(struct resampler *r)
 				y += 0x7f;
 			/* shift back and clamp to int16 range */
 			y = (y >> 8) * (long)cutoff >> 16;
-			if (y > INT16_MAX)
-				y = INT16_MAX;
-			else if (y < INT16_MIN)
-				y = INT16_MIN;
-			*r->out = y;
+			*r->out = y > 0x7fff ? 0x7fff : y < -0x8000 ? -0x8000 : y;
 			r->out += r->out_stride;
 			++n;
 		}
