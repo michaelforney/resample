@@ -19,7 +19,6 @@ static const short filter[][2] = {
 };
 
 enum {
-	N = (LEN(filter) - 1) / L,
 	B = (LEN(((struct resampler *)0)->buf) / 2 - 1) / 2,
 };
 
@@ -61,7 +60,7 @@ resample(struct resampler *r)
 	/* current time, input period, and output period */
 	unsigned long t = r->t, t_in = L << 16, t_out = ((unsigned long long)t_in << 16) / ratio;
 	/* filter position, step size, and maximum */
-	unsigned long p, p_0, dp = L * cutoff, p_max = N * t_in;
+	unsigned long p, p_0, dp = L * cutoff, p_end = LEN(filter) << 16;
 	short *x = r->x, *end = r->buf + 3 * B + 1;
 	size_t n = 0, i;
 	long y;
@@ -82,10 +81,10 @@ resample(struct resampler *r)
 			y = 0;
 			p_0 = (unsigned long long)t * cutoff >> 16;
 			/* left side of filter */
-			for (i = 0, p = p_0; i <= B && p <= p_max; ++i, p += dp)
+			for (i = 0, p = p_0; i <= B && p < p_end; ++i, p += dp)
 				y += x[-i] * h(p) >> 7;
 			/* right side of filter */
-			for (i = 1, p = dp - p_0; i <= B && p <= p_max; ++i, p += dp)
+			for (i = 1, p = dp - p_0; i <= B && p < p_end; ++i, p += dp)
 				y += x[i] * h(p) >> 7;
 			/* scale back to int16 range */
 			y = (((y + 0x80ll) >> 8) * (long)cutoff + 0x8000) >> 16;
