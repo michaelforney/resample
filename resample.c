@@ -57,9 +57,9 @@ size_t
 resample(struct resampler *r)
 {
 	unsigned long f_in = r->in_rate, f_out = r->out_rate;
-	unsigned long cutoff = f_in < f_out ? f_in : f_out;
+	unsigned long cutoff = f_in < f_out ? 0x10000 : f_out * 0x10000ull / f_in;
 	unsigned long t = r->t, t_in = L << 16, t_out = (unsigned long long)t_in * f_in / f_out;
-	unsigned long p, dt = t_in * cutoff / f_in, t_max = N * t_in;
+	unsigned long p, dt = t_in * cutoff >> 16, t_max = N * t_in;
 	short *x = r->x, *end = r->buf + 3 * B + 1;
 	size_t n = 0;
 	long y;
@@ -79,9 +79,9 @@ resample(struct resampler *r)
 			if (r->out_frames == 0)
 				goto done;
 			y = 0;
-			for (i = 0, p = t * cutoff / f_in; i <= B && p <= t_max; ++i, p += dt)
+			for (i = 0, p = t * cutoff >> 16; i <= B && p <= t_max; ++i, p += dt)
 				y += x[-i] * h(p) >> 7;
-			for (i = 1, p = (t_in - t) * cutoff / f_in; i <= B && p <= t_max; ++i, p += dt)
+			for (i = 1, p = (t_in - t) * cutoff >> 16; i <= B && p <= t_max; ++i, p += dt)
 				y += x[i] * h(p) >> 7;
 			/* round */
 			if (y & 0x80)
