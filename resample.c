@@ -62,7 +62,7 @@ resample(struct resampler *r)
 	unsigned long p, dt = t_in * cutoff / f_in, t_max = N * t_in;
 	short *x = r->x, *end = r->buf + 3 * B + 1;
 	size_t n = 0;
-	long v;
+	long y;
 	int i;
 
 	for (;;) {
@@ -78,21 +78,21 @@ resample(struct resampler *r)
 		for (; t < t_in; t += t_out, --r->out_frames) {
 			if (r->out_frames == 0)
 				goto done;
-			v = 0;
+			y = 0;
 			for (i = 0, p = t * cutoff / f_in; i <= B && p <= t_max; ++i, p += dt)
-				v += x[-i] * h(p) >> 7;
+				y += x[-i] * h(p) >> 7;
 			for (i = 1, p = (t_in - t) * cutoff / f_in; i <= B && p <= t_max; ++i, p += dt)
-				v += x[i] * h(p) >> 7;
+				y += x[i] * h(p) >> 7;
 			/* round */
-			if (v & 0x80)
-				v += 0x7f;
+			if (y & 0x80)
+				y += 0x7f;
 			/* shift back and clamp to int16 range */
-			v >>= 8;
-			if (v > INT16_MAX)
-				v = INT16_MAX;
-			else if (v < INT16_MIN)
-				v = INT16_MIN;
-			*r->out = v;
+			y >>= 8;
+			if (y > INT16_MAX)
+				y = INT16_MAX;
+			else if (y < INT16_MIN)
+				y = INT16_MIN;
+			*r->out = y;
 			r->out += r->out_stride;
 			++n;
 		}
