@@ -40,10 +40,10 @@ resample_eof(struct resampler *r)
 }
 
 /* evaluate the filter at time t, given in 16.16 fixed-point */
-static inline int16_t
+static inline long
 h(unsigned long t)
 {
-	const int16_t *c = filter[t >> 16];
+	const short *c = filter[t >> 16];
 	return c[0] + (c[1] * (long)(t & 0xffff) >> 16);
 }
 
